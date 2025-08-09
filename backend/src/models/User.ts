@@ -77,20 +77,37 @@ const userSchema = new Schema<IUser>({
   lastTestAttempt: {
     type: Date,
     default: null
+  },
+  phone: {
+    type: String,
+    default: null
+  },
+  organization: {
+    type: String,
+    default: null
+  },
+  position: {
+    type: String,
+    default: null
+  },
+  country: {
+    type: String,
+    default: null
+  },
+  city: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true, // Adds createdAt and updatedAt
-  toJSON: {
+  toJSON: { 
+    virtuals: true,
     transform: function(doc, ret) {
-      delete ret.password;
-      delete ret.emailVerificationToken;
-      delete ret.passwordResetToken;
-      delete ret.passwordResetExpires;
-      delete ret.otpCode;
-      delete ret.otpExpires;
-      return ret;
+      const { password, emailVerificationToken, passwordResetToken, passwordResetExpires, otpCode, otpExpires, ...safeUser } = ret;
+      return safeUser;
     }
-  }
+  },
+  toObject: { virtuals: true }
 });
 
 /**

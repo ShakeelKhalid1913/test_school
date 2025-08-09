@@ -81,6 +81,7 @@ router.get('/', [
     .withMessage('Level must be one of: A1, A2, B1, B2, C1, C2'),
   query('competencyArea')
     .optional()
+    .isString()
     .withMessage('Invalid competency area'),
   query('difficulty')
     .optional()

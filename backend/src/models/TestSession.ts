@@ -90,7 +90,7 @@ const testSessionSchema = new Schema<ITestSession>({
  */
 testSessionSchema.pre('save', function(next) {
   if (this.answers && this.answers.length > 0) {
-    const correctAnswers = this.answers.filter(answer => answer.isCorrect).length;
+    const correctAnswers = this.answers.filter((answer: any) => answer.isCorrect).length;
     const totalQuestions = this.questions.length;
     
     this.score = correctAnswers;
@@ -102,6 +102,19 @@ testSessionSchema.pre('save', function(next) {
   
   next();
 });
+
+/**
+ * Calculate score manually
+ */
+testSessionSchema.methods.calculateScore = function() {
+  if (this.answers && this.answers.length > 0) {
+    const correctAnswers = this.answers.filter((answer: any) => answer.isCorrect).length;
+    const totalQuestions = this.questions.length;
+    
+    this.score = correctAnswers;
+    this.percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+  }
+};
 
 /**
  * Determine achieved level and progression eligibility based on test step and percentage

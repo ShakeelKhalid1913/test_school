@@ -10,20 +10,18 @@ import { sendEmail } from '../services/emailService';
  * Generate JWT tokens for user
  */
 const generateTokens = (userId: string, email: string, role: UserRole) => {
-  const accessTokenSecret = process.env.JWT_ACCESS_SECRET!;
-  const refreshTokenSecret = process.env.JWT_REFRESH_SECRET!;
+  const accessTokenSecret = process.env.JWT_ACCESS_SECRET as string;
+  const refreshTokenSecret = process.env.JWT_REFRESH_SECRET as string;
 
-  const accessToken = jwt.sign(
-    { userId, email, role },
-    accessTokenSecret,
-    { expiresIn: process.env.JWT_ACCESS_EXPIRY || '15m' }
-  );
-
-  const refreshToken = jwt.sign(
-    { userId, email, role },
-    refreshTokenSecret,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRY || '7d' }
-  );
+  const payload = { userId, email, role };
+  
+  const accessToken = jwt.sign(payload, accessTokenSecret, { 
+    expiresIn: process.env.JWT_ACCESS_EXPIRY || '15m' 
+  } as any);
+  
+  const refreshToken = jwt.sign(payload, refreshTokenSecret, { 
+    expiresIn: process.env.JWT_REFRESH_EXPIRY || '7d' 
+  } as any);
 
   return { accessToken, refreshToken };
 };

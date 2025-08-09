@@ -60,7 +60,7 @@ const questionSchema = new Schema<IQuestion>({
 
 // Validation: Ensure at least one correct answer exists
 questionSchema.pre('save', function(next) {
-  const hasCorrectAnswer = this.options.some(option => option.isCorrect);
+  const hasCorrectAnswer = this.options.some((option: any) => option.isCorrect);
   if (!hasCorrectAnswer) {
     return next(new Error('Question must have at least one correct answer'));
   }
@@ -72,6 +72,18 @@ questionSchema.pre('save', function(next) {
   
   next();
 });
+
+/**
+ * Validate question options
+ */
+questionSchema.methods.validateOptions = function(): boolean {
+  if (!this.options || this.options.length < 2 || this.options.length > 4) {
+    return false;
+  }
+  
+  const hasCorrectAnswer = this.options.some((option: any) => option.isCorrect);
+  return hasCorrectAnswer;
+};
 
 // Indexes for better query performance
 questionSchema.index({ competencyArea: 1, level: 1 });

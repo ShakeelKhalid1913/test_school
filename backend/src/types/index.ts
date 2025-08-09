@@ -1,4 +1,6 @@
 import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+import { Request } from 'express';
 
 // User role enumeration
 export enum UserRole {
@@ -46,6 +48,15 @@ export enum CompetencyArea {
   // Add more competency areas as needed
 }
 
+// Authentication interfaces
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: UserRole;
+  };
+}
+
 // User interface
 export interface IUser extends Document {
   _id: string;
@@ -63,8 +74,22 @@ export interface IUser extends Document {
   currentLevel: AssessmentLevel | null;
   canTakeTest: boolean;
   lastTestAttempt?: Date;
+  phone?: string;
+  organization?: string;
+  position?: string;
+  country?: string;
+  city?: string;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Virtual properties
+  fullName: string;
+  
+  // Methods
+  comparePassword(candidatePassword: string): Promise<boolean>;
+  generatePasswordResetToken(): string;
+  generateOTP(): string;
+  canTakeTestStep(step: number): boolean;
 }
 
 // Question interface
@@ -80,17 +105,21 @@ export interface IQuestion extends Document {
   level: AssessmentLevel;
   difficulty: 'easy' | 'medium' | 'hard';
   isActive: boolean;
-  createdBy: string;
+  createdBy: mongoose.Types.ObjectId;
+  step: TestStep;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Methods
+  validateOptions(): boolean;
 }
 
 // Test session interface
 export interface ITestSession extends Document {
   _id: string;
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   step: TestStep;
-  questions: string[]; // Question IDs
+  questions: mongoose.Types.ObjectId[]; // Question IDs
   answers: {
     questionId: string;
     selectedOption: number;
@@ -107,6 +136,10 @@ export interface ITestSession extends Document {
   canProceedToNext: boolean;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Methods
+  calculateScore(): void;
+  determineLevelAndProgression(): void;
 }
 
 // Certificate interface
